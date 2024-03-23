@@ -122,12 +122,13 @@ server <- function(input, output, session) {
 ```
 Trong trường hợp này dataset chỉ cần 1 lần retrieve từ input. Shiny app sẽ gọn và chạy nhanh hơn.
 
-## Cheatsheet
+## Các link và tài liệu khác liên quan Shiny
 [Link cheatsheet](https://rstudio.github.io/cheatsheets/shiny.pdf)
+[Gallery](https://shiny.posit.co/r/gallery/)
 
 ## Contents
 
-- [2. Basic UI](basicui.md)
+- [2. Basic UI](basicui.m)
 - [3. Basic Reactive]
 
 
