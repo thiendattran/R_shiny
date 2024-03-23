@@ -126,8 +126,9 @@ Trong trường hợp này dataset chỉ cần 1 lần retrieve từ input. Shin
 [Link cheatsheet](https://rstudio.github.io/cheatsheets/shiny.pdf)
 
 ## Contents
-- [Basic UI](basicui.md)
-- [Basic Reactive]
+
+- [2. Basic UI](basicui.md)
+- [3. Basic Reactive]
 
 
 
