@@ -1,5 +1,4 @@
-# R_shiny
-Học R shiny
+# Tự học R - Shiny
 
 ## Tài liệu
 <img width="257" alt="image" src="https://github.com/thiendattran/R_shiny/assets/120559860/78bb8f88-5717-4d3a-89c1-7989b940fe3f">
