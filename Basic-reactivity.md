@@ -200,7 +200,142 @@ server <- function(input, output, session) {
 ## Kiểm soát thời gian
 Chúng ta có thể tăng hoặc giảm số lần reactive expression được thực hiện (chapter 15)
 
-## 
+## Timed invalidation
+`reactiveTimer()` để tăng tần suất update
+
+```
+freqpoly <- function(x1, x2, binwidth = 0.1, xlim = c(-3, 3)) {
+  df <- data.frame(
+    x = c(x1, x2),
+    g = c(rep("x1", length(x1)), rep("x2", length(x2)))
+  )
+  
+  ggplot(df, aes(x, colour = g)) +
+    geom_freqpoly(binwidth = binwidth, size = 1) +
+    coord_cartesian(xlim = xlim)
+}
+
+ui <- fluidPage(
+  fluidRow(
+    column(3, 
+      numericInput("lambda1", label = "lambda1", value = 3),
+      numericInput("lambda2", label = "lambda2", value = 5),
+      numericInput("n", label = "n", value = 1e4, min = 0)
+    ),
+    column(9, plotOutput("hist"))
+  )
+)
+server <- function(input, output, session) {
+  x1 <- reactive(rpois(input$n, input$lambda1))
+  x2 <- reactive(rpois(input$n, input$lambda2))
+  output$hist <- renderPlot({
+    freqpoly(x1(), x2(), binwidth = 1, xlim = c(0, 40))
+  }, res = 96)
+}
+
+server <- function(input, output, session) {
+  timer <- reactiveTimer(500)
+  
+  x1 <- reactive({
+    timer()
+    rpois(input$n, input$lambda1)
+  })
+  x2 <- reactive({
+    timer()
+    rpois(input$n, input$lambda2)
+  })
+  
+  output$hist <- renderPlot({
+    freqpoly(x1(), x2(), binwidth = 1, xlim = c(0, 40))
+  }, res = 96)
+}
+```
+<img width="677" alt="Screenshot 2024-03-31 at 04 11 32" src="https://github.com/thiendattran/R_shiny/assets/123424766/e524ef0a-48cc-4253-be80-900d3c0f9e48">
+
+## Nhấp chuột
+Trong tình huống ở trên, nếu mô phỏng mất 1s để chạy xong mà mô phỏng đc cập nhật mỗi 0.5s sẽ dẫn tới việc Shiny sẽ phải làm nhiều để đuổi kịp. Hoặc nếu ai đó nhấp chuột nhanh vào các nút trong ứng dụng trong khi việc tính toán đang thực hiện tương đối tốn thời gian sẽ tạo ra một số lượng lón công việc chờ Shiny và khi nó đang làm việc trong một khối lượng lớn công việc chờ như vậy nó sẽ không thể phản ứng vs bất kì sự việc mới. Hậu quả là trải nghiệm ng dùng kém.
+<br>
+<br> Giải pháp: dùng `actionButtion()`
+```
+freqpoly <- function(x1, x2, binwidth = 0.1, xlim = c(-3, 3)) {
+  df <- data.frame(
+    x = c(x1, x2),
+    g = c(rep("x1", length(x1)), rep("x2", length(x2)))
+  )
+  
+  ggplot(df, aes(x, colour = g)) +
+    geom_freqpoly(binwidth = binwidth, size = 1) +
+    coord_cartesian(xlim = xlim)
+}
+
+ui <- fluidPage(
+  fluidRow(
+    column(3, 
+      numericInput("lambda1", label = "lambda1", value = 3),
+      numericInput("lambda2", label = "lambda2", value = 5),
+      numericInput("n", label = "n", value = 1e4, min = 0),
+      actionButton("simulate", "Simulate!")
+    ),
+    column(9, plotOutput("hist"))
+  )
+)
+
+server <- function(input, output, session) {
+  x1 <- reactive({
+    input$simulate
+    rpois(input$n, input$lambda1)
+  })
+  x2 <- reactive({
+    input$simulate
+    rpois(input$n, input$lambda2)
+  })
+  output$hist <- renderPlot({
+    freqpoly(x1(), x2(), binwidth = 1, xlim = c(0, 40))
+  }, res = 96)
+}
+```
+<img width="684" alt="Screenshot 2024-03-31 at 04 29 34" src="https://github.com/thiendattran/R_shiny/assets/123424766/1ca49c93-8319-48ff-ab05-20e34925b095">
+
+Vấn đề: graph sẽ được update khi bấm vào nút `simulate` nhưng nó cũng sẽ được update khi thay đổi n, lamda1,..
+<br> Giải pháp: `eventReactive()` gồm 2 tham số: phụ thuộc vào cái igf và tính toán cái gì. Nghiã là nó sẽ chỉ tính x1() và x2() khi `simulate` được click. 
+
+````
+server <- function(input, output, session) {
+  x1 <- eventReactive(input$simulate, {
+    rpois(input$n, input$lambda1)
+  })
+  x2 <- eventReactive(input$simulate, {
+    rpois(input$n, input$lambda2)
+  })
+
+  output$hist <- renderPlot({
+    freqpoly(x1(), x2(), binwidth = 1, xlim = c(0, 40))
+  }, res = 96)
+}
+```
+
+<img width="680" alt="Screenshot 2024-03-31 at 04 39 52" src="https://github.com/thiendattran/R_shiny/assets/123424766/f5f21e6b-02c8-435c-8c12-b6f1792b1df6">
+
+## Observers
+Công cụ thông báo observeEvent() console sẽ nhận đc thông báo mỗi khi 'name' được cập nhật
+```
+ui <- fluidPage(
+  textInput("name", "What's your name?"),
+  textOutput("greeting")
+)
+
+server <- function(input, output, session) {
+  string <- reactive(paste0("Hello ", input$name, "!"))
+  
+  output$greeting <- renderText(string())
+  observeEvent(input$name, {
+    message("Greeting performed")
+  })
+}
+```
+
+
+
 
 
 
