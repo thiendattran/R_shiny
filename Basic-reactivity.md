@@ -90,9 +90,88 @@ server <- function(input, output, session) {
 
 ## [BAI TAP](https://mastering-shiny.org/basic-reactivity.html)
 ## Reactive expressions (tiep theo)
+Đầu tiên tạo 2 hàm `freqpoly()` và `t_tést()`
+```
+library(ggplot2)
 
+freqpoly <- function(x1, x2, binwidth = 0.1, xlim = c(-3, 3)) {
+  df <- data.frame(
+    x = c(x1, x2),
+    g = c(rep("x1", length(x1)), rep("x2", length(x2)))
+  )
 
-Chung ta se su dung mot app phuc tap hon de thay duoc loi ich cua reactive expressions. 
+  ggplot(df, aes(x, colour = g)) +
+    geom_freqpoly(binwidth = binwidth, size = 1) +
+    coord_cartesian(xlim = xlim)
+}
+
+t_test <- function(x1, x2) {
+  test <- t.test(x1, x2)
+  
+  # use sprintf() to format t.test() results compactly
+  sprintf(
+    "p value: %0.3f\n[%0.2f, %0.2f]",
+    test$p.value, test$conf.int[1], test$conf.int[2]
+  )
+}
+```
+Tạo app
+```
+ui <- fluidPage(
+  fluidRow(
+    column(4, 
+      "Distribution 1",
+      numericInput("n1", label = "n", value = 1000, min = 1),
+      numericInput("mean1", label = "µ", value = 0, step = 0.1),
+      numericInput("sd1", label = "σ", value = 0.5, min = 0.1, step = 0.1)
+    ),
+    column(4, 
+      "Distribution 2",
+      numericInput("n2", label = "n", value = 1000, min = 1),
+      numericInput("mean2", label = "µ", value = 0, step = 0.1),
+      numericInput("sd2", label = "σ", value = 0.5, min = 0.1, step = 0.1)
+    ),
+    column(4,
+      "Frequency polygon",
+      numericInput("binwidth", label = "Bin width", value = 0.1, step = 0.1),
+      sliderInput("range", label = "range", value = c(-3, 3), min = -5, max = 5)
+    )
+  ),
+  fluidRow(
+    column(9, plotOutput("hist")),
+    column(3, verbatimTextOutput("ttest"))
+  )
+)
+```
+Note:
+- fluidRow() đầu tiên: tạo dòng đầu tiên
+- fluidRow() thứ hai: tạo dòng thứ 2
+- column(): tạo cột
+- Số 4 trong column(): Về cơ bản, mỗi dòng sẽ có 12 ô. Số 4 muốn nói lấy 4 ô trong 12 ô tương ứng vs độ rộng của cột
+```
+server <- function(input, output, session) {
+  output$hist <- renderPlot({
+    x1 <- rnorm(input$n1, input$mean1, input$sd1)
+    x2 <- rnorm(input$n2, input$mean2, input$sd2)
+    
+    freqpoly(x1, x2, binwidth = input$binwidth, xlim = input$range)
+  }, res = 96)
+
+  output$ttest <- renderText({
+    x1 <- rnorm(input$n1, input$mean1, input$sd1)
+    x2 <- rnorm(input$n2, input$mean2, input$sd2)
+    
+    t_test(x1, x2)
+  })
+}
+```
+## The reactive graph (tiếp theo)
+<br>Shiny đủ thông minh để biết chỉ update khi inpute thay đổi
+<br>Shiny không đủ thông minh để chạy chọn lọc một phần code. Nghĩa là một là chạy tất cả hai là không chạy.
+<br>Xem ví dụ về dưới để thấy tầm quan trọng của reactive expression. 
+
+<img width="229" alt="Screenshot 2024-03-31 at 03 39 22" src="https://github.com/thiendattran/R_shiny/assets/123424766/ad620195-cc0d-4fc5-8532-f2506ac32ef7">
+
 
 
 
