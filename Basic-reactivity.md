@@ -44,7 +44,7 @@ server <- function(input, output, session) {
 - thiet lap mot moi truong phan ung dac biet (special reactive context) de theo doi tu dong input va output
 - chuyen doi output trong code R thanh HTML de bieu dien tren trang web
 <br> Mot vai loi co the gap:
-- quen dung `render` fucntion
+- quên dùng `render` function
 ```
 server <- function(input, output, session) {
   output$greeting <- "Hello human"
@@ -59,13 +59,15 @@ server <- function(input, output, session) {
   message("The greeting is ", output$greeting)
 }
 shinyApp(ui, server)
-#> Error: Reading from shinyoutput object is not allowed.
+#> Error: Reading from shiny output object is not allowed.
 ```
 Phan biet `imperative programming` va `declarative programming`:
-- **imparative programming** command can duoc thuc hien ngay lap tuc (command R de load data, hinh anh hoa data,...)
+- **imperative programming** command: yêu cầu phải được thực hiện ngay lập tức (command R de load data, hinh anh hoa data,...)
 - **declarative programming** dien ta muc tieu cau hon hoac mo ta cac rang buoc quan trong, phu thuoc vao nguoi khac de quyet dinh nhu the nao hoac khi nao chuyen doi thanh hanh dong (Shiny)
-## Reactive graph 
+## Reactive expression
 <img width="140" alt="TEST" src="https://github.com/thiendattran/R_shiny/assets/123424766/5fe6e268-5882-45bd-ab00-657cecc4ea53">
+
+<img width="656" alt="Screenshot 2024-03-31 at 03 21 36" src="https://github.com/thiendattran/R_shiny/assets/123424766/a7a4982c-1ada-49ac-b121-6c7ff756a3d8">
 
 <br> **Trong R** code duoc chay theo thu tu tu tren xuong duoi. 
 <br> **Trong Shiny** code chi chay khi can. Code chi chay khi `name` thay doi
