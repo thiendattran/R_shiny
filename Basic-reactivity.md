@@ -166,11 +166,42 @@ server <- function(input, output, session) {
 }
 ```
 ## The reactive graph (tiếp theo)
-<br>Shiny đủ thông minh để biết chỉ update khi inpute thay đổi
-<br>Shiny không đủ thông minh để chạy chọn lọc một phần code. Nghĩa là một là chạy tất cả hai là không chạy.
-<br>Xem ví dụ về dưới để thấy tầm quan trọng của reactive expression. 
-
+- Shiny đủ thông minh để biết chỉ update khi inpute thay đổi
+- Shiny không đủ thông minh để chạy chọn lọc một phần code. Nghĩa là một là chạy tất cả hai là không chạy.
+- Xem ví dụ về dưới để thấy tầm quan trọng của reactive expression.
+     - 1 phần code đã được dùng ở trên:
+```
+x1 <- rnorm(input$n1, input$mean1, input$sd1)
+x2 <- rnorm(input$n2, input$mean2, input$sd2)
+t_test(x1, x2)
+```
 <img width="229" alt="Screenshot 2024-03-31 at 03 39 22" src="https://github.com/thiendattran/R_shiny/assets/123424766/ad620195-cc0d-4fc5-8532-f2506ac32ef7">
+
+<be> Nếu thay đổi n1, giá trị khác cũng sẽ được update vì Shiny chỉ nhìn vào đầu ra
+- Giải pháp: dùng `reactive()`
+```
+server <- function(input, output, session) {
+  x1 <- reactive(rnorm(input$n1, input$mean1, input$sd1))
+  x2 <- reactive(rnorm(input$n2, input$mean2, input$sd2))
+
+  output$hist <- renderPlot({
+    freqpoly(x1(), x2(), binwidth = input$binwidth, xlim = input$range)
+  }, res = 96)
+
+  output$ttest <- renderText({
+    t_test(x1(), x2())
+  })
+}
+```
+      - reactive graph trở thành
+  
+<img width="299" alt="Screenshot 2024-03-31 at 03 54 01" src="https://github.com/thiendattran/R_shiny/assets/123424766/0b82c310-da56-4210-8309-61420f5117ec">
+
+## Kiểm soát thời gian
+Chúng ta có thể tăng hoặc giảm số lần reactive expression được thực hiện (chapter 15)
+
+## 
+
 
 
 
