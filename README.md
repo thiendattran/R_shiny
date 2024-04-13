@@ -130,8 +130,8 @@ Trong trường hợp này dataset chỉ cần 1 lần retrieve từ input. Shin
 ## Contents
 
 - [2. Basic UI](basicui.md)
-- [3. Basic Reactive]
-
+- [3. Basic Reactive](Basic-reactivity.md)
+- [4. Project ER](project_ER.md)
 
 
 
