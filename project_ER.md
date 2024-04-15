@@ -12,6 +12,10 @@ library(tidyverse)
 Tạo folder để download data vào, đoạn code này dùng `dir.create` sẽ tạo folder vào trong directory của chúng ta (kiểm tra directory bằng `getwd`)
 
 ```
+# Tạo folder ten neiss
+dir.create("neiss")
+
+# Download 
 download <- function(name) {
   url <- "https://github.com/hadley/mastering-shiny/raw/main/neiss/"
   download.file(paste0(url, name), paste0("neiss/", name), quiet = TRUE)
@@ -78,7 +82,7 @@ summary %>%
 
 Nhưng rõ ràng data này chưa được standardize theo độ tuổi. ta có thể dùng weight và population để standardize
 ```
-summary <- toilet %>% 
+summary <- selected %>% 
   count(age,sex,wt = weight) %>%
   left_join(population, by = c("age","sex")) %>%
   mutate(rate = n/population * 10000)
