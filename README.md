@@ -132,7 +132,7 @@ Trong trường hợp này dataset chỉ cần 1 lần retrieve từ input. Shin
 - [2. Basic UI](basicui.md)
 - [3. Basic Reactive](Basic-reactivity.md)
 - [4. Project ER](project_ER.md)
-- [6. Layout](Chap 6_Layout.md)
+- [6. Layout](Chap6_Layout.md)
 
 ## Author
 - [Đạt Trần](https://github.com/thiendattran)
