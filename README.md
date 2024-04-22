@@ -125,7 +125,12 @@ Trong trường hợp này dataset chỉ cần 1 lần retrieve từ input. Shin
 
 ## Các link và tài liệu khác liên quan Shiny
 [Link cheatsheet](https://rstudio.github.io/cheatsheets/shiny.pdf)
+
 [Gallery](https://shiny.posit.co/r/gallery/)
+
+[Bootswatch themes](https://bootswatch.com)
+
+[Userinterface for Shiny](https://unleash-shiny.rinterface.com/survival-kit-javascript)
 
 ## Contents
 
