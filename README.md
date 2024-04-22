@@ -13,8 +13,10 @@
 | STT | Ngày | Section | Lead |
 | --- | --- | --- | --- |
 |1|24/03|Cơ bản về Rshiny+Chương 2| Đạt|
-|2|31/03|Chương 3 + 4|Vân + Đạt|
-|3|07/04|Chương 5|...|
+|2|31/03|Chương 3|Vân + Đạt|
+|3|07/04|Chương 4|Đạt|
+|4|21/04|Chương 6|Trang|
+|5|28/04|...|...|
 
 ## Tổng quan
 Shiny là R package được dùng để tạo ra web app tương tác được (interactive web app).
