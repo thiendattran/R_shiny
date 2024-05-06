@@ -163,6 +163,116 @@ server <- function(input, output, session) {
 }
 shinyApp(ui= ui, server=server)
 ```
+$\color{red}{LUU \ Y:}$
+Doan tin nhan se xuat hien trong 5s
+Them ```color``` de phan biet kieu tin nhan voi ```type=" "```
+
+```
+ui <- fluidPage(
+  actionButton("goodnight", "Good night")
+)
+server <- function(input, output, session) {
+  observeEvent(input$goodnight, {
+    showNotification("So long")
+    Sys.sleep(1)
+    showNotification("Farewell", type = "message")
+    Sys.sleep(1)
+    showNotification("Auf Wiedersehen", type = "warning")
+    Sys.sleep(1)
+    showNotification("Adieu", type = "error")
+  })
+}
+shinyApp(ui= ui, server=server)
+```
+![image](https://github.com/thiendattran/R_shiny/assets/123424766/d76963c9-6b88-45ca-9967-1fd388da22e0)
+
+
+$\color{blue}{Hien \ thi \ tin \ nhan}$ va $\color{blue}{tu \ dong \ bien \ mat}$ sau khi cong viec duoc hoan thanh voi ```showNotification()``` va ```on.exist(removeNotification())```
+```
+ui <- fluidPage(
+  actionButton("startTask", "Start Task"),
+  dataTableOutput("data_table")
+)
+
+server <- function(input, output, session) {
+
+  observeEvent(input$startTask, {
+
+    notification <- showNotification("Reading data...", duration = NULL, closeButton = FALSE)
+    
+    Sys.sleep(3)
+    data <- iris
+
+    on.exit(removeNotification(notification))
+
+    output$data_table <- renderDataTable({
+      data
+    })
+  })
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+**Progressive updates**
+```
+ui <- fluidPage(
+  tableOutput("data")
+)
+
+server <- function(input, output, session) {
+  notify <- function(msg, id = NULL) {
+    showNotification(msg, id = id, duration = NULL, closeButton = FALSE)
+  }
+
+  data <- reactive({ 
+    id <- notify("Reading data...")
+    on.exit(removeNotification(id), add = TRUE)
+    Sys.sleep(2)
+      
+    notify("Reticulating splines...", id = id)
+    Sys.sleep(2)
+    
+    notify("Herding llamas...", id = id)
+    Sys.sleep(2)
+
+    notify("Orthogonalizing matrices...", id = id)
+    Sys.sleep(2)
+        
+    mtcars
+  })
+  
+  output$data <- renderTable(head(data()))
+}
+shinyApp(ui = ui, server = server)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
