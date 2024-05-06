@@ -50,21 +50,119 @@ server <- function(input, output, session) {
 shinyApp(ui= ui, server=server)
 ```
 
+![Capture](https://github.com/thiendattran/R_shiny/assets/123424766/66f2d319-876b-4dc7-b666-7391c841b2e1)
 
+```
+ui <- fluidPage(
+  selectInput("language", "Language", choices = c("", "English", "French","Vietnamese")),
+  textInput("name", "Name"),
+  textOutput("greeting")
+)
 
+server <- function(input, output, session) {
+  greetings <- c(
+    English = "Hello", 
+    French = "Bonjour",
+    Vietnamese = "Xin chao"
+  )
+  output$greeting <- renderText({
+    paste0(greetings[[input$language]], " ", input$name, "!")
+  })
+}
+shinyApp(ui= ui, server=server)
+```
+![Capture](https://github.com/thiendattran/R_shiny/assets/123424766/1f7bdfb7-8f48-4047-add6-d1e1c73e5d89)
 
+```
+ui <- fluidPage(
+  selectInput("language", "Language", choices = c("", "English", "French","Vietnamese")),
+  textInput("name", "Name"),
+  textOutput("greeting")
+)
 
+server <- function(input, output, session) {
+  greetings <- c(
+    English = "Hello", 
+    French = "Bonjour",
+    Vietnamese = "Xin chao"
+  )
+  output$greeting <- renderText({
+    req(input$language, input$name)
+    paste0(greetings[[input$language]], " ", input$name, "!")
+  })
+}
+shinyApp(ui= ui, server=server)
+```
 
+```
+ui <- fluidPage(
+  shinyFeedback::useShinyFeedback(),
+  textInput("dataset", "Dataset name"), 
+  tableOutput("data")
+)
 
+server <- function(input, output, session) {
+  data <- reactive({
+    req(input$dataset)
+    
+    exists <- exists(input$dataset, "package:datasets")
+    shinyFeedback::feedbackDanger("dataset", !exists, "Unknown dataset")
+    req(exists, cancelOutput = TRUE)
 
+    get(input$dataset, "package:datasets")
+  })
+  
+  output$data <- renderTable({
+    head(data())
+  })
+}
+shinyApp(ui= ui, server=server)
 
+```
+$\color{red}{Nhuoc \ diem \ cua \ shinyFeedback:}$
+<br>Khi co nhieu input thi message ```error``` se hien thi o input nao???
+<br> **validate()**
+```
+ui <- fluidPage(
+  numericInput("x", "x", value = 0),
+  selectInput("trans", "transformation", 
+    choices = c("square", "log", "square-root")
+  ),
+  textOutput("out")
+)
 
-
-
-
-
-
-
+server <- function(input, output, session) {
+  output$out <- renderText({
+    if (input$x < 0 && input$trans %in% c("log", "square-root")) {
+      validate("x can not be negative for this transformation")
+    }
+    
+    switch(input$trans,
+      square = input$x ^ 2,
+      "square-root" = sqrt(input$x),
+      log = log(input$x)
+    )
+  })
+}
+```
+$\color{red}{Hien \ thi \ thong \ bao \ voi \showNotification():}$
+```
+ui <- fluidPage(
+  actionButton("goodnight", "Good night")
+)
+server <- function(input, output, session) {
+  observeEvent(input$goodnight, {
+    showNotification("So long")
+    Sys.sleep(1)
+    showNotification("Farewell")
+    Sys.sleep(1)
+    showNotification("Auf Wiedersehen")
+    Sys.sleep(1)
+    showNotification("Adieu")
+  })
+}
+shinyApp(ui= ui, server=server)
+```
 
 
 
