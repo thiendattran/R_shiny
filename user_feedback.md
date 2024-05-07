@@ -446,6 +446,54 @@ shinyApp(ui = ui, server = server)
 ```
 **XAC NHAN VA HUY BO**
 
+```
+library(shinyjs)
+ui <- fluidPage(
+  useShinyjs(), 
+  fileInput('file', 'Data', buttonLabel ="Upload"),
+  actionButton("delete","Delete file")
+)
+
+server <- function(input, output, session) {
+  
+    modal_confirm <- modalDialog(
+  "Are you sure you want to delete?",
+  title = "Deleting files",
+  footer = tagList(
+    actionButton("cancel", "Cancel"),
+    actionButton("ok", "Delete", class = "btn btn-danger")
+  )
+)
+    
+  observeEvent(input$delete, {
+    if(!is.null(input$file)){
+       showModal(modal_confirm)
+    } else {
+      showNotification("No file uploaded", type = "message")
+    }
+   
+  })
+  
+  observeEvent(input$ok, {
+    removeModal()
+     showNotification("Files deleted", type ="message")
+     reset("file")
+  })
+  observeEvent(input$cancel, {
+    removeModal()
+  })
+}
+shinyApp(ui = ui, server = server)
+```
+
+![image](https://github.com/thiendattran/R_shiny/assets/123424766/a5eaaef2-8def-4eb9-91e5-244a1298d785)
+
+$\color{red}{LUU \ Y:}$
+- shiny khong ho tro xoa input. Neu muon xoa file input, su dung ```shinyjs::useShinyjs()``` va ```reset()```
+- tao **dialog box** voi ```modalDialog()```
+- showModal(): hien hop thoai
+- removeModal(): an hop thoai
+
 
 
 
