@@ -247,12 +247,204 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+**Progress bars**
+<br>Tao thanh tien trinh vs ```withProgress()``` va ```incProgress()```
+- ```withProgress()```: xuat hien khi bat dau chay code va bien mat khi code da chay xong
+- ```incProgress()```: su tang dan cua thanh $\color{blue}{PROGRESS}$
+```
+ui <- fluidPage(
+  numericInput("steps", "How many steps?", 10),
+  actionButton("go", "go"),
+  textOutput("result")
+)
 
+server <- function(input, output, session) {
+  data <- eventReactive(input$go, {
+    withProgress(message = "Computing random number", {
+      for (i in seq_len(input$steps)) {
+        Sys.sleep(0.5)
+        incProgress(1 / input$steps)
+      }
+      runif(1)
+    })
+  })
+  
+  output$result <- renderText(round(data(), 2))
+}
+shinyApp(ui = ui, server = server)
+```
+![image](https://github.com/thiendattran/R_shiny/assets/123424766/5a758eee-f954-42aa-9f14-6855c92c8352)
 
+```
+library(waiter)
+ui <- fluidPage(
+  waiter::use_waitress(),
+  numericInput("steps", "How many steps?", 10),
+  actionButton("go", "go"),
+  textOutput("result")
+)
 
+server <- function(input, output, session) {
+  data <- eventReactive(input$go, {
+    waitress <- waiter::Waitress$new(max = input$steps)
+    on.exit(waitress$close())
+    
+    for (i in seq_len(input$steps)) {
+      Sys.sleep(0.5)
+      waitress$inc(1)
+    }
+    
+    runif(1)
+  })
+  
+  output$result <- renderText(round(data(), 2))
+}
+shinyApp(ui = ui, server = server)
+```
+```waiter::use_waiter()```: su dung tinh nang man hinh tai
+<br>
+```eventReactive()```: kich hoat block of code ben trong khi user click vao nut $\color{blue}{go}$
+<br>
+```on.exit(waitress$close())```: dam bao rang $\color{green}{progress \ bar}$ se bien mat khi code chay xong hoac xay ra loi trong qua trinh chay code
+<br>
+```waitress$inc(1)```: su tang dan cua thanh $\color{green}{progress \ bar}$ moi 1 unit
+<br>
+```runif(1)```: chay 1 so ngau nhien tu 0 den 1 khi vong lap hoan thanh
+<br>
 
+**Progress bar de len phan input**
+- overlay: progress bar mo duc an toan bo input
+- overlay-opacity: progress bar mo duc phu len input
+- overlay-percent: progress bar mo duc dong thoi hien so %
 
+```
+ui <- fluidPage(
+  waiter::use_waitress(),
+  numericInput("steps", "How many steps?", 10),
+  actionButton("go", "go"),
+  textOutput("result")
+)
 
+server <- function(input, output, session) {
+  data <- eventReactive(input$go, {
+    waitress <- Waitress$new(selector = "#steps", theme = "overlay-percent")
+    on.exit(waitress$close())
+    
+    for (i in seq_len(input$steps)) {
+      Sys.sleep(0.5)
+      waitress$inc(1)
+    }
+    
+    runif(1)
+  })
+  
+  output$result <- renderText(round(data(), 2))
+}
+shinyApp(ui = ui, server = server)
+```
+**Spinners (VONG QUAY)**
+```
+ui <- fluidPage(
+  waiter::use_waiter(),
+  actionButton("go", "go"),
+  textOutput("result")
+)
+
+server <- function(input, output, session) {
+  data <- eventReactive(input$go, {
+    waiter <- waiter::Waiter$new()
+    waiter$show()
+    on.exit(waiter$hide())
+    
+    Sys.sleep(sample(5, 1))
+    runif(1)
+  })
+  output$result <- renderText(round(data(), 2))
+}
+shinyApp(ui = ui, server = server)
+```
+Them **id=** de spinner khong che phu trang
+
+```
+ui <- fluidPage(
+  waiter::use_waiter(),
+  actionButton("go", "go"),
+  textOutput("result")
+)
+
+server <- function(input, output, session) {
+  data <- eventReactive(input$go, {
+    waiter <- waiter::Waiter$new(id= "result")
+    waiter$show()
+    on.exit(waiter$hide())
+    
+    Sys.sleep(sample(5, 1))
+    runif(1)
+  })
+  output$result <- renderText(round(data(), 2))
+}
+shinyApp(ui = ui, server = server)
+```
+
+```
+ui <- fluidPage(
+  waiter::use_waiter(),
+  actionButton("go", "go"),
+  textOutput("result")
+)
+
+server <- function(input, output, session) {
+  data <- eventReactive(input$go, {
+    waiter <- waiter::Waiter$new(id= "result")$show()
+    on.exit(waiter$hide())
+    
+    Sys.sleep(sample(5, 1))
+    runif(1)
+  })
+  output$result <- renderText(round(data(), 2))
+}
+shinyApp(ui = ui, server = server)
+```
+
+```
+ui <- fluidPage(
+  waiter::use_waiter(),
+  actionButton("go", "go"),
+  plotOutput("plot"),
+)
+
+server <- function(input, output, session) {
+  data <- eventReactive(input$go, {
+    waiter::Waiter$new(html = spin_ripple())$show()
+    
+    Sys.sleep(2)
+    data.frame(x = runif(50), y = runif(50))
+  })
+  
+  output$plot <- renderPlot(plot(data()), res = 96)
+}
+shinyApp(ui = ui, server = server)
+```
+Mot kieu khac voi ```shinycssloaders::withSpinner()```
+
+```
+library(shinycssloaders)
+
+ui <- fluidPage(
+  actionButton("go", "go"),
+  withSpinner(plotOutput("plot")),
+)
+server <- function(input, output, session) {
+  data <- eventReactive(input$go, {
+    Sys.sleep(3)
+    data.frame(x = runif(50), y = runif(50))
+  })
+  
+  output$plot <- renderPlot(plot(data()), res = 96)
+}
+shinyApp(ui = ui, server = server)
+```
+**XAC NHAN VA HUY BO**
 
 
 
